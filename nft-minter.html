@@ -1,0 +1,540 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NFT Minter</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #0f0c29 0%, #302b63 50%, #24243e 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            background: rgba(26, 26, 46, 0.9);
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.5);
+            border: 1px solid rgba(255, 8, 68, 0.3);
+        }
+        
+        h1 {
+            text-align: left;
+            color: white;
+            margin-bottom: 8px;
+            font-size: 36px;
+            text-shadow: 0 0 20px rgba(255, 8, 68, 0.5);
+            display: flex;
+            align-items: center;
+        }
+        
+        h3 {
+            color: white;
+            font-size: 20px;
+            margin-bottom: 15px;
+            text-shadow: 0 0 10px rgba(255, 8, 68, 0.3);
+        }
+        
+        .title-logo {
+            width: 45px;
+            height: 45px;
+            margin-right: 12px;
+            filter: drop-shadow(0 0 10px rgba(255, 8, 68, 0.6));
+        }
+        
+        .subtitle {
+            text-align: left;
+            color: #ccc;
+            margin-bottom: 30px;
+            font-size: 14px;
+        }
+        
+        .network-badge {
+            background: #28a745;
+            color: white;
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: bold;
+        }
+        
+        .two-column {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            align-items: start;
+        }
+        
+        .left-column, .right-column {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+        
+        .wallet-section {
+            background: #1a1a2e;
+            padding: 25px;
+            border-radius: 15px;
+            border: 2px solid #ff0844;
+            box-shadow: 0 0 20px rgba(255, 8, 68, 0.3);
+        }
+        
+        .wallet-header {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+        
+        .metamask-logo {
+            width: 40px;
+            height: 40px;
+            filter: drop-shadow(0 0 10px rgba(255, 133, 27, 0.8));
+        }
+        
+        .wallet-address {
+            font-family: monospace;
+            font-size: 11px;
+            color: #ccc;
+            word-break: break-all;
+            margin-top: 15px;
+            padding: 10px;
+            background: rgba(0,0,0,0.3);
+            border-radius: 8px;
+            border: 1px solid rgba(255, 8, 68, 0.2);
+        }
+        
+        button {
+            background: linear-gradient(135deg, #ff0844 0%, #ffb199 100%);
+            color: white;
+            border: none;
+            padding: 14px 35px;
+            border-radius: 12px;
+            font-size: 17px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s;
+            width: 100%;
+            box-shadow: 0 0 20px rgba(255, 8, 68, 0.4);
+        }
+        
+        button:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 0 30px rgba(255, 8, 68, 0.7);
+            background: linear-gradient(135deg, #ff0844 0%, #ff6b9d 100%);
+        }
+        
+        button:disabled {
+            background: #444;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+        
+        .stats-section {
+            margin-top: -40px;
+        }
+        
+        .stats {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+            margin-top: 12px;
+        }
+        
+        .stat-card {
+            background: linear-gradient(135deg, #1a1a2e 0%, #2d2d44 100%);
+            padding: 18px;
+            border-radius: 12px;
+            text-align: center;
+            border: 2px solid rgba(255, 8, 68, 0.3);
+            box-shadow: 0 0 15px rgba(255, 8, 68, 0.2);
+            transition: all 0.3s;
+            cursor: default;
+        }
+        
+        .stat-card:hover {
+            transform: scale(1.05);
+            box-shadow: 0 0 30px rgba(255, 8, 68, 0.5);
+        }
+        
+        .stat-label {
+            font-size: 11px;
+            color: #ccc;
+            margin-bottom: 8px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        
+        .stat-value {
+            font-size: 32px;
+            font-weight: bold;
+            color: #ff0844;
+            text-shadow: 0 0 20px rgba(255, 8, 68, 0.5);
+        }
+        
+        .token-ids {
+            background: rgba(0,0,0,0.3);
+            padding: 12px;
+            border-radius: 10px;
+            margin-top: 16px;
+            border: 1px solid rgba(255, 8, 68, 0.2);
+        }
+        
+        .token-ids h4 {
+            color: #ff0844;
+            font-size: 13px;
+            margin-bottom: 8px;
+        }
+        
+        .token-ids-list {
+            color: #ccc;
+            font-size: 13px;
+            line-height: 1.5;
+        }
+        
+        .etherscan-link {
+            display: inline-block;
+            color: #60a5fa;
+            text-decoration: none;
+            font-size: 13px;
+            margin-top: 10px;
+            padding: 8px 15px;
+            background: rgba(96, 165, 250, 0.1);
+            border-radius: 8px;
+            border: 1px solid rgba(96, 165, 250, 0.3);
+            transition: all 0.3s;
+        }
+        
+        .etherscan-link:hover {
+            background: rgba(96, 165, 250, 0.2);
+            transform: translateX(5px);
+        }
+        
+        .msg {
+            padding: 15px;
+            border-radius: 10px;
+            margin-top: 15px;
+            font-weight: 500;
+        }
+        
+        .success {
+            background: rgba(40, 167, 69, 0.2);
+            color: #4ade80;
+            border: 1px solid #4ade80;
+        }
+        
+        .error {
+            background: rgba(255, 8, 68, 0.2);
+            color: #ff6b9d;
+            border: 1px solid #ff6b9d;
+        }
+        
+        .info {
+            background: rgba(52, 152, 219, 0.2);
+            color: #60a5fa;
+            border: 1px solid #60a5fa;
+        }
+        
+        .spinner {
+            display: inline-block;
+            width: 16px;
+            height: 16px;
+            border: 3px solid rgba(255,255,255,.3);
+            border-radius: 50%;
+            border-top-color: #fff;
+            animation: spin 1s ease-in-out infinite;
+            margin-left: 10px;
+        }
+        
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        
+        footer {
+            margin-top: 40px;
+            padding-top: 30px;
+            border-top: 1px solid rgba(255, 8, 68, 0.2);
+            text-align: center;
+        }
+        
+        .footer-links {
+            display: flex;
+            justify-content: center;
+            gap: 30px;
+            margin-bottom: 15px;
+            flex-wrap: wrap;
+        }
+        
+        .footer-links a {
+            color: #60a5fa;
+            text-decoration: none;
+            font-size: 14px;
+            transition: all 0.3s;
+        }
+        
+        .footer-links a:hover {
+            color: #ff0844;
+            transform: translateY(-2px);
+        }
+        
+        .footer-credit {
+            color: #888;
+            font-size: 13px;
+            margin-top: 10px;
+        }
+        
+        @media (max-width: 768px) {
+            .two-column {
+                grid-template-columns: 1fr;
+            }
+            .container {
+                padding: 20px;
+            }
+            h1 {
+                font-size: 28px;
+            }
+            .stats-section {
+                margin-top: 0;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- HEADER -->
+        <div style="margin-bottom: 30px;">
+            <h1>
+                <img src="https://cdn-icons-png.flaticon.com/512/9519/9519923.png" alt="NFT" class="title-logo">
+                NFT Minter
+            </h1>
+            <p class="subtitle">
+                Mint your own SimpleNFT on <span class="network-badge">Sepolia</span>
+            </p>
+        </div>
+        
+        <!-- 2 COLUMNS -->
+        <div class="two-column">
+            <!-- LEFT -->
+            <div class="left-column">
+                <div class="wallet-section">
+                    <div class="wallet-header">
+                        <img src="https://upload.wikimedia.org/wikipedia/commons/3/36/MetaMask_Fox.svg" 
+                             alt="MetaMask" 
+                             class="metamask-logo">
+                        <h3 style="margin: 0; color: white;">Connect Wallet</h3>
+                    </div>
+                    
+                    <button id="connectBtn" onclick="connect()">Connect MetaMask</button>
+                    
+                    <div id="walletInfo" style="display: none;">
+                        <div class="wallet-address" id="address"></div>
+                        <a href="https://sepolia.etherscan.io/address/0xbd2A7c9387434BAcdEF05f0226ea9FE67fF47F5e" 
+                           target="_blank" 
+                           class="etherscan-link">
+                             View Contract on Etherscan →
+                        </a>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- RIGHT -->
+            <div class="right-column">
+                <div id="statsWrapper" class="stats-section" style="display: none;">
+                    <h3>Stats:</h3>
+                    <div class="stats">
+                        <div class="stat-card">
+                            <div class="stat-label">Your NFTs</div>
+                            <div class="stat-value" id="balance">0</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-label">Total Minted</div>
+                            <div class="stat-value" id="totalMinted">0</div>
+                        </div>
+                    </div>
+                    
+                    <!-- TOKEN IDs -->
+                    <div id="tokenIdsSection" class="token-ids" style="display: none;">
+                        <h4> Your Token IDs:</h4>
+                        <div class="token-ids-list" id="tokenIdsList">Loading...</div>
+                    </div>
+                </div>
+                
+                <button id="mintBtn" onclick="mintNFT()" disabled> Mint NFT</button>
+                
+                <div id="messages"></div>
+            </div>
+        </div>
+        
+        <!-- FOOTER -->
+        <footer>
+            <div class="footer-links">
+                <a href="https://sepolia.etherscan.io/address/0xbd2A7c9387434BAcdEF05f0226ea9FE67fF47F5e" target="_blank"> Contract</a>
+                <a href="https://github.com/BokaBlock" target="_blank"> GitHub</a>
+                <a href="https://sepoliafaucet.com" target="_blank"> Sepolia Faucet</a>
+                <a href="https://remix.ethereum.org" target="_blank"> Remix IDE</a>
+            </div>
+            <div class="footer-credit">
+                Built with Love on Ethereum Sepolia Testnet
+            </div>
+        </footer>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/web3@1.10.0/dist/web3.min.js"></script>
+    <script>
+        const ADDRESS = "0xbd2A7c9387434BAcdEF05f0226ea9FE67fF47F5e";
+        const ABI = [{"inputs":[],"name":"mint","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[{"internalType":"address","name":"","type":"address"}],"name":"balanceOf","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"name","outputs":[{"internalType":"string","name":"","type":"string"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"symbol","outputs":[{"internalType":"string","name":"","type":"string"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"tokenCounter","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"uint256","name":"","type":"uint256"}],"name":"tokenOwner","outputs":[{"internalType":"address","name":"","type":"address"}],"stateMutability":"view","type":"function"}];
+        
+        let web3;
+        let contract;
+        let account;
+        
+        async function connect() {
+            try {
+                if (!window.ethereum) {
+                    alert('Install MetaMask!');
+                    return;
+                }
+                
+                if (typeof Web3 === 'undefined') {
+                    alert('Web3 not loaded! Refresh page.');
+                    return;
+                }
+                
+                web3 = new Web3(window.ethereum);
+                
+                const accounts = await window.ethereum.request({
+                    method: 'eth_requestAccounts'
+                });
+                
+                account = accounts[0];
+                
+                const chainId = await web3.eth.getChainId();
+                
+                if (chainId !== 11155111) {
+                    alert('Switch to Sepolia Testnet!');
+                    return;
+                }
+                
+                contract = new web3.eth.Contract(ABI, ADDRESS.toLowerCase());
+                
+                document.getElementById('address').innerText = `Connected: ${account}`;
+                document.getElementById('walletInfo').style.display = 'block';
+                document.getElementById('connectBtn').innerText = 'Connected ✓';
+                document.getElementById('connectBtn').disabled = true;
+                document.getElementById('connectBtn').style.background = '#28a745';
+                document.getElementById('mintBtn').disabled = false;
+                document.getElementById('statsWrapper').style.display = 'block';
+                
+                msg('✅ Connected! Ready to mint.', 'success');
+                
+                await loadStats();
+                await loadTokenIds();
+                
+            } catch (error) {
+                console.error('❌ Error:', error);
+                alert('Failed: ' + error.message);
+            }
+        }
+        
+        async function loadStats() {
+            try {
+                const balance = await contract.methods.balanceOf(account).call();
+                const totalMinted = await contract.methods.tokenCounter().call();
+                
+                document.getElementById('balance').innerText = balance;
+                document.getElementById('totalMinted').innerText = totalMinted;
+                
+            } catch (error) {
+                console.error('❌ Stats error:', error);
+            }
+        }
+        
+        async function loadTokenIds() {
+            try {
+                const totalMinted = await contract.methods.tokenCounter().call();
+                const myTokens = [];
+                
+                for (let i = 1; i <= totalMinted; i++) {
+                    const owner = await contract.methods.tokenOwner(i).call();
+                    if (owner.toLowerCase() === account.toLowerCase()) {
+                        myTokens.push(i);
+                    }
+                }
+                
+                if (myTokens.length > 0) {
+                    document.getElementById('tokenIdsSection').style.display = 'block';
+                    document.getElementById('tokenIdsList').innerHTML = 
+                        myTokens.map(id => `<span style="color: #ff0844; font-weight: bold;">#${id}</span>`).join(', ');
+                } else {
+                    document.getElementById('tokenIdsSection').style.display = 'none';
+                }
+                
+            } catch (error) {
+                console.error('❌ Token IDs error:', error);
+            }
+        }
+        
+        async function mintNFT() {
+            try {
+                const btn = document.getElementById('mintBtn');
+                btn.disabled = true;
+                btn.innerHTML = '⏳ Minting...<span class="spinner"></span>';
+                
+                msg('⏳ Sending transaction...', 'info');
+                
+                const receipt = await contract.methods.mint().send({
+                    from: account,
+                    gas: 300000
+                });
+                
+                const txHash = receipt.transactionHash;
+                const newTokenId = await contract.methods.tokenCounter().call();
+                
+                msg(`✅ NFT #${newTokenId} minted! 🎉`, 'success');
+                
+                const txLink = `https://sepolia.etherscan.io/tx/${txHash}`;
+                document.getElementById('messages').innerHTML += 
+                    `<a href="${txLink}" target="_blank" class="etherscan-link">View Transaction on Etherscan →</a>`;
+                
+                setTimeout(async () => {
+                    await loadStats();
+                    await loadTokenIds();
+                }, 2000);
+                
+            } catch (error) {
+                console.error('❌ Mint error:', error);
+                msg('❌ Failed: ' + error.message, 'error');
+            } finally {
+                const btn = document.getElementById('mintBtn');
+                btn.disabled = false;
+                btn.innerHTML = '🔥 Mint NFT';
+            }
+        }
+        
+        function msg(text, type) {
+            const div = document.createElement('div');
+            div.className = 'msg ' + type;
+            div.innerText = text;
+            document.getElementById('messages').innerHTML = '';
+            document.getElementById('messages').appendChild(div);
+            
+            if (type === 'success') {
+                setTimeout(() => {
+                    if (div.parentNode) div.remove();
+                }, 5000);
+            }
+        }
+    </script>
+</body>
+</html>
